@@ -1,0 +1,47 @@
+﻿<#@ template language="C#" hostspecific="True" debug="True" #>
+<#@ output extension="cs" #>
+<#@ include file="T4Toolbox.tt" #>
+<#@ assembly name="System.Configuration" #>
+<#@ import namespace="System.Configuration" #>
+
+<#
+// <copyright file="StrongTypeConfiguration.tt" author="Chris Pacey">
+//  Copyright ©2011 . All Rights Reserved.
+// </copyright>
+
+
+#>
+
+using System;
+using System.Configuration;
+
+public static class Config
+{
+
+<#
+try 
+{
+	var appSettings = ConfigurationManager.AppSettings;
+	if (appSettings.Count > 0)
+	{
+		for(int i = 0; i < appSettings.Count; i++)
+		{ #>
+			
+			public String <#= appSettings.GetKey(i) #>
+			{
+				get{ return "<#= appSettings[i] #>";
+			}
+			
+		<#}
+	}
+}
+catch (ConfigurationErrorsException e)
+{ 
+	#>
+	// Error: <#= e.ToString() #>
+	<#
+}
+
+#>
+
+}
