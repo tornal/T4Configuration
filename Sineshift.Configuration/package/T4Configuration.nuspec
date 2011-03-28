@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>T4Configuration</id>
+    <version>0.1.1</version>
+    <authors>Chris Pacey</authors>
+    <owners>Chris Pacey</owners>
+    <licenseUrl>http://dl.dropbox.com/u/7685389/License.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>T4Configuration is a template that generates a static class in C# of your App Settings and Connection Strings located in your app.config or your web.config.</description>
+    <language>en-GB</language>
+    <tags>T4 Configuration .config app.config web.config</tags>
+  </metadata>
+</package>

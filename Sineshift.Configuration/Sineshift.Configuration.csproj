@@ -48,10 +48,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="StrongTypeConfiguration.generated.cs">
+    <Compile Include="T4Configuration.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>StrongTypeConfiguration.tt</DependentUpon>
+      <DependentUpon>T4Configuration.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +60,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="StrongTypeConfiguration.tt">
+    <None Include="T4Configuration.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>StrongTypeConfiguration.generated.cs</LastGenOutput>
+      <LastGenOutput>T4Configuration.generated.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
