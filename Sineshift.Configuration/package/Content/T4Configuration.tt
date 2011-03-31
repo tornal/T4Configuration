@@ -93,11 +93,15 @@ foreach(var attribute in this.ConnKeys)
 		get
 		{
 			String configFilePath = String.Empty;
-			if (File.Exists(Host.ResolvePath("app.config")))
+			try {
+				if (File.Exists(Host.ResolvePath("app.config")))
 				configFilePath = Host.ResolvePath("app.config");
-			else
+			}
+			catch(FileNotFoundException)
+			{
+				if (File.Exists(Host.ResolvePath("web.config")))
 				configFilePath = Host.ResolvePath("web.config");
-			
+			}
 			return XDocument.Load(configFilePath);
 		}
 	}

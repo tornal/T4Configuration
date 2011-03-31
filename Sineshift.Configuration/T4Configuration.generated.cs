@@ -6,40 +6,19 @@ namespace Sineshift.Configuration
 	public static class Config
 	{
 	
-		public static String ClientValidationEnabled
+		public static String Setting1
 		{
 			get
 			{
-				return ConfigurationManager.AppSettings["ClientValidationEnabled"];
+				return ConfigurationManager.AppSettings["Setting1"];
 			}
 		}
 	
-		public static String UnobtrusiveJavaScriptEnabled
+		public static String Setting2
 		{
 			get
 			{
-				return ConfigurationManager.AppSettings["UnobtrusiveJavaScriptEnabled"];
-			}
-		}
-		public static String ApplicationServices
-		{
-			get
-			{
-				return ConfigurationManager.ConnectionStrings["ApplicationServices"].ConnectionString;
-			}
-		}
-		public static String MisAdminWebEntities
-		{
-			get
-			{
-				return ConfigurationManager.ConnectionStrings["MisAdminWebEntities"].ConnectionString;
-			}
-		}
-		public static String MisDataContext
-		{
-			get
-			{
-				return ConfigurationManager.ConnectionStrings["MisDataContext"].ConnectionString;
+				return ConfigurationManager.AppSettings["Setting2"];
 			}
 		}
 	}
