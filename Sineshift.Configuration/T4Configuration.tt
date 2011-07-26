@@ -1,10 +1,10 @@
 ﻿<#@ template language="C#" hostspecific="True" debug="True" #>
 <#@ output extension=".generated.cs" #>
-<#@ include file="T4Toolbox.tt" #>
 <#@ assembly name="System.Xml" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="System.Xml.Linq" #>
 <#@ assembly name="System.Configuration" #>
+<#@ assembly name="EnvDTE" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
@@ -12,7 +12,7 @@
 <#@ import namespace="System.Xml.Linq" #>
 <#@ import namespace="System.Linq" #>
 <#
-// <copyright file="StrongTypeConfiguration.tt" author="Chris Pacey">
+// <copyright file="T4Configuration.tt" author="Chris Pacey">
 //  Copyright ©2011 . All Rights Reserved.
 // </copyright>
 
@@ -21,7 +21,7 @@
 using System;
 using System.Configuration;
 
-namespace <#= this.NameSpaceName #>
+namespace <#= this.GetNamespace #>
 {
 	public static class Config
 	{
@@ -30,7 +30,7 @@ namespace <#= this.NameSpaceName #>
 foreach(var attribute in this.AppKeys)
 {
 #>	
-		public static String <#= attribute #>
+		public static String <#= this.CleanStringForClass(attribute) #>
 		{
 			get
 			{
@@ -42,7 +42,7 @@ foreach(var attribute in this.AppKeys)
 foreach(var attribute in this.ConnKeys)
 {
 #>
-		public static String <#= attribute #>
+		public static String <#= this.CleanStringForClass(attribute) #>
 		{
 			get
 			{
@@ -56,11 +56,14 @@ foreach(var attribute in this.ConnKeys)
 }
 
 <#+ 
-	private String NameSpaceName
+	public String GetNamespace
 	{
-		get
+		get 
 		{
-			return TransformationContext.DefaultNamespace;
+			var hostServiceProvider = (IServiceProvider) Host;
+			EnvDTE.DTE dte = (EnvDTE.DTE) hostServiceProvider.GetService(typeof(EnvDTE.DTE));
+			EnvDTE.ProjectItem templateProjectItem = dte.Solution.FindProjectItem(Host.TemplateFile);
+			return templateProjectItem.ContainingProject.Properties.Item("DefaultNamespace").Value.ToString();
 		}
 	}
 	
@@ -104,5 +107,10 @@ foreach(var attribute in this.ConnKeys)
 			}
 			return XDocument.Load(configFilePath);
 		}
+	}
+
+	private String CleanStringForClass (String name)
+	{
+		return name.Replace(":", "").Replace("-", "");
 	}
 #>
