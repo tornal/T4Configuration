@@ -3,6 +3,6 @@ T4 Configuration ReadMe.
 T4Configuration is a T4 template file that lives in Visual Studio 2010 and automatically creates a static class with properties 
 from your configuration file.
 
-Changelog 26/07/2010:
+Changelog 26/07/2011:
 - Taken out dependency to T4Toolbox
 - Updated Nuget package
