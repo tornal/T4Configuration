@@ -1,4 +1,43 @@
-﻿<#@ template language="C#" hostspecific="True" debug="True" #>
+﻿<# /*
+	
+	T4 Configuration
+
+	Author: Chris Pacey (@ccpacey)
+
+	T4Configuration is a T4 (text template) file that lives in Visual Studio 2010 and automatically
+	creates a static class with properties from your configuration (*.config) file.
+
+	After installation it should run automatically, if you need to regenerate the class just right click and select "run custom tool".
+
+	To use in your application you should just have to type:
+
+	'Config.appSetting'
+
+	'Config.connectionString'
+
+	It will also be in your root namespace.
+
+	http://nuget.org/packages/T4Configuration	
+	https://github.com/tornal/T4Configuration
+	
+	This script is issued under the following BSD License.
+	
+	BSD License
+	Copyright (c) 2012, Chris Pacey
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+	Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+	Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+	Neither the name of the Author nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+	LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/ #>
+<#@ template language="C#" hostspecific="True" debug="True" #>
 <#@ output extension=".generated.cs" #>
 <#@ assembly name="System.Xml" #>
 <#@ assembly name="System.Core" #>
@@ -12,11 +51,7 @@
 <#@ import namespace="System.Xml.Linq" #>
 <#@ import namespace="System.Linq" #>
 <#
-// <copyright file="T4Configuration.tt" author="Chris Pacey">
-//  Copyright ©2011 . All Rights Reserved.
-// </copyright>
-
-
+	this.LookForAllRootConfigs();
 #>
 using System;
 using System.Configuration;
@@ -56,7 +91,7 @@ foreach(var attribute in this.ConnKeys)
 }
 
 <#+ 
-	public String GetNamespace
+	private String GetNamespace
 	{
 		get 
 		{
@@ -67,50 +102,65 @@ foreach(var attribute in this.ConnKeys)
 		}
 	}
 	
+	private IEnumerable<String> _appKeys;
 	private IEnumerable<String> AppKeys
 	{
 		get
 		{
-			var appKeys = (from settings in this.XmlDoc.Descendants("appSettings")
-								from add in settings.Elements("add")
-								from atts in add.Attributes("key")
-								select atts.Value);
-			return appKeys;
+			if (this._appKeys == null)
+				this._appKeys = new List<String>();
+			return this._appKeys;
 		}
+		set { this._appKeys = value; }
 	}
 	
+	private IEnumerable<String> _connKeys;
 	private IEnumerable<String> ConnKeys
 	{
 		get
 		{
-			var connKeys = (from settings in this.XmlDoc.Descendants("connectionStrings")
-								from add in settings.Elements("add")
-								from atts in add.Attributes("name")
-								select atts.Value);
-			return connKeys;
+			if (this._connKeys == null)
+				this._connKeys = new List<String>();
+			return this._connKeys;
 		}
+		set { this._connKeys = value; }
 	}
 	
-	private XDocument XmlDoc
-	{
-		get
-		{
-			String configFilePath = String.Empty;
-			try {
-				if (File.Exists(Host.ResolvePath("app.config")))
-				configFilePath = Host.ResolvePath("app.config");
-			}
-			catch(FileNotFoundException)
-			{
-				if (File.Exists(Host.ResolvePath("web.config")))
-				configFilePath = Host.ResolvePath("web.config");
-			}
-			return XDocument.Load(configFilePath);
-		}
-	}
-
+	private String _configFilePath;
+	
 	private String CleanStringForClass (String name)
 	{
-		return name.Replace(":", "").Replace("-", "");
+		return name.Replace(":", "").Replace("-", "").Trim();
+	}
+	
+	private void LookForAllRootConfigs()
+	{
+		this._configFilePath = Host.ResolvePath(".").Substring(0, Host.ResolvePath(".").Length - 1);
+		var files = Directory.GetFiles(this._configFilePath, "*.config");
+		if (files.Any())
+		{
+			List<String> appKeyStore = new List<String>();
+			List<String> connKeyStore = new List<String>();
+			foreach (var fileName in files)
+			{
+				if (File.Exists(fileName)) {
+					appKeyStore.AddRange(
+						XDocument.Load(fileName)
+							.Descendants("appSettings")
+							.Elements("add")
+							.Attributes("key")
+							.Select(s => s.Value));
+					connKeyStore.AddRange(
+						XDocument.Load(fileName)
+							.Descendants("connectionStrings")
+							.Elements("add")
+							.Attributes("name")
+							.Select(s => s.Value));
+					
+				}
+			}
+			if (appKeyStore.Any()) this.AppKeys = appKeyStore;
+			if (connKeyStore.Any()) this.ConnKeys = connKeyStore;
+		}
 	}
 #>
